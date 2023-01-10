@@ -11,16 +11,16 @@ public class CustomerDTOSize {
     private int state;
     private int points;
 
-    public CustomerDTOSize(int id, int firstName, int lastName, int birthDate, int phone, int address, int city, int state, int points) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
-        this.phone = phone;
-        this.address = address;
-        this.city = city;
-        this.state = state;
-        this.points = points;
+    public CustomerDTOSize(String id, String firstName, String lastName, String birthDate, String phone, String address, String city, String state, String points) {
+        this.id = id.length();
+        this.firstName = firstName.length();
+        this.lastName = lastName.length();
+        this.birthDate = birthDate.length();
+        this.phone = phone.length();
+        this.address = address.length();
+        this.city = city.length();
+        this.state = state.length();
+        this.points = points.length();
     }
 
     public int getId() {

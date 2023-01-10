@@ -44,8 +44,9 @@ public class Repository {
             statement.setInt(2, elements);
 
             final ResultSet resultSet = statement.executeQuery();
+            CustomerParser customerParser = new CustomerParser(null);
             while (resultSet.next()) {
-                customerEntities.add(CustomerParser.parseToCustomer(resultSet));
+                customerEntities.add(customerParser.parseToCustomer(resultSet));
             }
         } catch (Exception e) {
             e.printStackTrace();

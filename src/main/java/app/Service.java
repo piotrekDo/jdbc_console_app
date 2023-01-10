@@ -1,8 +1,6 @@
 package app;
 
-import customer.CustomerDTO;
-import customer.CustomerEntity;
-import customer.CustomerParser;
+import customer.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -27,15 +25,19 @@ public class Service {
         return tables;
     }
 
-    public List<String> loadDataFromTable(String table, int offset, int elements) {
-        LinkedList<String> customerDTOS = new LinkedList<>();
+    public CustomerPrinterData loadDataFromTable(String table, int offset, int elements) {
 
         switch (table) {
             case "customers" -> {
+                LinkedList<CustomerDTO> customerDTOS = new LinkedList<>();
                 LinkedList<CustomerEntity> customerEntities = repository.selectDataFromCustomersTable(offset, elements);
-                customerDTOS.add(new CustomerDTO("customer_id", "first_name", "last_name", "birth_date", "phone", "address", "city", "state", "points").toString());
-                customerEntities.forEach(customerEntity -> customerDTOS.add(CustomerParser.parseEntityToDto(customerEntity).toString()));
-                return customerDTOS;
+                customerDTOS.add(new CustomerDTO("customer_id", "first_name", "last_name", "birth_date", "phone", "address", "city", "state", "points"));
+                CustomerDTOSize customerDTOSize = new CustomerDTOSize("customer_id", "first_name", "last_name", "birth_date", "phone", "address", "city", "state", "points");
+                CustomerParser customerParser = new CustomerParser(customerDTOSize);
+                customerEntities.forEach(customerEntity -> {
+                    customerDTOS.add(customerParser.parseEntityToDto(customerEntity));
+                });
+                return new CustomerPrinterData(customerDTOSize, customerDTOS);
             }
 
             default -> throw new IllegalStateException("Unexpected value: " + table);

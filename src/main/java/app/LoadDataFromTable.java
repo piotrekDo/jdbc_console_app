@@ -1,8 +1,7 @@
 package app;
 
-import customer.CustomerDTO;
+import customer.CustomerPrinterData;
 
-import java.util.List;
 
 public class LoadDataFromTable {
 
@@ -23,8 +22,8 @@ public class LoadDataFromTable {
         int offset = 0;
         int elements = 20;
         do {
-            List<String> customerDTOS = service.loadDataFromTable(tableName, offset, elements);
-            consolePrinter.print(tableName, customerDTOS);
+            CustomerPrinterData customerPrinterData = service.loadDataFromTable(tableName, offset, elements);
+            consolePrinter.printCustomers(tableName, customerPrinterData);
             runnning = false;
         } while (runnning);
     }
