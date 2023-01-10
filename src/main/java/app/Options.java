@@ -1,3 +1,5 @@
+package app;
+
 import java.util.Arrays;
 
 public class Options {
@@ -15,23 +17,23 @@ public class Options {
     public void mainLoop() {
         boolean running = true;
         do {
-            consolePrinter.print("Menu główne" ,Arrays.stream(getMainOptions()).toList());
+            consolePrinter.print("Menu główne", Arrays.stream(getMainOptions()).toList());
             System.out.print("Wybierz: ");
-            int userInput = inputCollector.getInput(getMainOptions().length);
-            Options.OptionsMenu option = Options.OptionsMenu.values()[userInput];
+            int userInput = inputCollector.getNumericInput(getMainOptions().length);
+            OptionsMenu option = OptionsMenu.values()[userInput];
             switch (option) {
                 case EXIT -> {
                     running = false;
                     System.out.println("Zamykam kontakt z bazą");
                 }
                 case LOAD -> {
-                    consolePrinter.print("Dostępne tabele" ,service.getAllTableNames());
+                    new LoadOptions(consolePrinter, inputCollector, service).loadOptions();
                 }
             }
         } while (running);
     }
 
-    String[] getMainOptions() {
+    private String[] getMainOptions() {
         String[] options = new String[OptionsMenu.values().length];
         for (int i = 1; i < OptionsMenu.values().length; i++) {
             OptionsMenu option = OptionsMenu.values()[i];
@@ -43,7 +45,7 @@ public class Options {
     }
 
 
-    enum OptionsMenu {
+    private enum OptionsMenu {
         EXIT("Zakończ program"),
         LOAD("Wczytaj dane");
 

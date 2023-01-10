@@ -1,9 +1,11 @@
+package app;
+
 import java.util.Scanner;
 
 public class InputCollector {
     Scanner input = new Scanner(System.in);
 
-    int getInput(int range) {
+    int getNumericInput(int range) {
         int userInput = -1;
 
         do {

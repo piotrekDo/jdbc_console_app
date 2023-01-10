@@ -1,8 +1,13 @@
+package app;
+
+import customer.CustomerEntity;
+import customer.CustomerParser;
+
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.LinkedList;
-import java.util.List;
 
 public class Repository {
 
@@ -15,7 +20,7 @@ public class Repository {
     LinkedList<String> getAllTableNames() {
         LinkedList<String> results = new LinkedList<>();
         try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(
+            final ResultSet resultSet = statement.executeQuery(
                     "SELECT TABLE_NAME \n" +
                             "FROM INFORMATION_SCHEMA.TABLES\n" +
                             "WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='sql_store';");
@@ -27,5 +32,24 @@ public class Repository {
             System.out.println("Unexpected error occurred " + e.getMessage());
         }
         return results;
+    }
+
+
+    public LinkedList<CustomerEntity> selectDataFromCustomersTable(int offset, int elements) {
+        LinkedList<CustomerEntity> customerEntities = new LinkedList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT * FROM customers LIMIT ?, ?;")) {
+            statement.setInt(1, offset);
+            statement.setInt(2, elements);
+
+            final ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                customerEntities.add(CustomerParser.parseToCustomer(resultSet));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return customerEntities;
     }
 }
