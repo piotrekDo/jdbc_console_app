@@ -4,7 +4,6 @@ import customer.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class Service {
 
@@ -25,7 +24,7 @@ public class Service {
         return tables;
     }
 
-    public CustomerPrinterData loadDataFromTable(String table, int offset, int elements) {
+    public CustomerPrinterPage loadDataFromTable(String table, int offset, int elements) {
 
         switch (table) {
             case "customers" -> {
@@ -37,7 +36,7 @@ public class Service {
                 customerEntities.forEach(customerEntity -> {
                     customerDTOS.add(customerParser.parseEntityToDto(customerEntity));
                 });
-                return new CustomerPrinterData(customerDTOSize, customerDTOS);
+                return new CustomerPrinterPage(customerDTOSize, customerDTOS, offset, elements);
             }
 
             default -> throw new IllegalStateException("Unexpected value: " + table);

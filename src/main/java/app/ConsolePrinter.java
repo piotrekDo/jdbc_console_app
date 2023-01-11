@@ -2,7 +2,7 @@ package app;
 
 import customer.CustomerDTO;
 import customer.CustomerDTOSize;
-import customer.CustomerPrinterData;
+import customer.CustomerPrinterPage;
 
 import java.util.List;
 
@@ -36,12 +36,15 @@ public class ConsolePrinter {
         System.out.println(bottomLine);
     }
 
-    public void printCustomers(String tableName, CustomerPrinterData customerPrinterData) {
+    public void printCustomers(String tableName, CustomerPrinterPage customerPrinterData) {
         CustomerDTOSize size = customerPrinterData.getSize();
         List<CustomerDTO> dto = customerPrinterData.getDto();
         int totalLength = size.getId() + size.getFirstName() + size.getLastName() + size.getBirthDate()
                 + size.getPhone() + size.getAddress() + size.getCity() + size.getState() + size.getPoints() + (offset * 2);
         System.out.println(getTopLine(totalLength + 8, tableName));
+        printEmptyLine(totalLength + 8);
+
+        printSummary(totalLength + 8, customerPrinterData.getOffset(), customerPrinterData.getElements());
         printEmptyLine(totalLength + 8);
 
         dto.forEach(customer -> {
@@ -179,8 +182,28 @@ public class ConsolePrinter {
        });
 
         printEmptyLine(totalLength + 8);
+        printEmptyLine(totalLength + 8);
+
         System.out.println(getBottomLine(totalLength + 8));
 
+    }
+
+    private void printSummary(int length, int pageOffset, int elements) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("+");
+        for (int i = 0; i < offset; i++) {
+            stringBuilder.append(" ");
+        }
+
+        String message = String.format("Wyswietlam %d stronę, %d elementów", pageOffset / elements + 1, elements);
+        stringBuilder.append(message);
+
+        for (int i = 0; i < length - offset - message.length(); i++) {
+            stringBuilder.append(" ");
+        }
+
+        stringBuilder.append("+");
+        System.out.println(stringBuilder);
     }
 
     private void printEmptyLine(int length) {
