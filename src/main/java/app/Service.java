@@ -1,9 +1,7 @@
 package app;
 
-import customer.*;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class Service {
 
@@ -24,23 +22,22 @@ public class Service {
         return tables;
     }
 
-    public CustomerPrinterPage loadDataFromTable(String table, int offset, int elements) {
+    public DataPage loadDataFromTable(String table, Map<String, String> tableDetails, int offset, int elements) {
+        LinkedList<LinkedList<String>> results = repository.selectDataFromTable(table, tableDetails, offset, elements);
+        LinkedHashMap<String, Integer> maxLengths = new LinkedHashMap<>();
+        results.get(0).forEach(header -> maxLengths.put(header, 0));
 
-        switch (table) {
-            case "customers" -> {
-                LinkedList<CustomerDTO> customerDTOS = new LinkedList<>();
-                LinkedList<CustomerEntity> customerEntities = repository.selectDataFromCustomersTable(offset, elements);
-                customerDTOS.add(new CustomerDTO("customer_id", "first_name", "last_name", "birth_date", "phone", "address", "city", "state", "points"));
-                CustomerDTOSize customerDTOSize = new CustomerDTOSize("customer_id", "first_name", "last_name", "birth_date", "phone", "address", "city", "state", "points");
-                CustomerParser customerParser = new CustomerParser(customerDTOSize);
-                customerEntities.forEach(customerEntity -> {
-                    customerDTOS.add(customerParser.parseEntityToDto(customerEntity));
-                });
-                return new CustomerPrinterPage(customerDTOSize, customerDTOS, offset, elements);
-            }
+        List<String> keys = maxLengths.keySet().stream().toList();
+        IntStream.range(0, maxLengths.size())
+                .forEach(i -> results.stream()
+                        .map(x -> x.get(i) == null ? 4 : x.get(i).length())
+                        .max(Integer::compare)
+                        .ifPresent(x -> maxLengths.put(keys.get(i), Math.max(x, maxLengths.get(keys.get(i))))));
 
-            default -> throw new IllegalStateException("Unexpected value: " + table);
-        }
+        return new DataPage(results, maxLengths);
+    }
 
+    public LinkedHashMap<String, String> fetchTableDetails(String tableName) {
+        return repository.fetchTableColumnsData(tableName);
     }
 }

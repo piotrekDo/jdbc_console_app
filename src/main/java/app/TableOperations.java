@@ -1,5 +1,6 @@
 package app;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class TableOperations {
         boolean running = true;
         do {
             consolePrinter.print(tableName, getOptions());
+            LinkedHashMap<String, String> tableDetails = service.fetchTableDetails(tableName);
             System.out.print("Wybierz: ");
             int userInput = inputCollector.getNumericInput(getOptions().size() - 1);
             TableOperationsMenu option = TableOperationsMenu.values()[userInput];
@@ -30,7 +32,7 @@ public class TableOperations {
                     running = false;
                 }
                 case LOAD -> {
-                    new LoadDataFromTable(consolePrinter, inputCollector, service, tableName).load();
+                    new LoadDataFromTable(consolePrinter, inputCollector, service, tableName, tableDetails).load();
                 }
             }
         } while (running);

@@ -1,8 +1,8 @@
 package app;
 
-import customer.CustomerPrinterPage;
-
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Map;
 
 
 public class LoadDataFromTable {
@@ -11,21 +11,23 @@ public class LoadDataFromTable {
     private final InputCollector inputCollector;
     private final Service service;
     private final String tableName;
+    private final Map<String, String> tableDetails;
 
-    public LoadDataFromTable(ConsolePrinter consolePrinter, InputCollector inputCollector, Service service, String tableName) {
+    public LoadDataFromTable(ConsolePrinter consolePrinter, InputCollector inputCollector, Service service, String tableName, Map<String, String> tableDetails) {
         this.consolePrinter = consolePrinter;
         this.inputCollector = inputCollector;
         this.service = service;
         this.tableName = tableName;
+        this.tableDetails = tableDetails;
     }
 
     void load() {
         boolean runnning = true;
         int offset = 0;
-        int elements = 20;
+        int elements = 50;
         do {
-            CustomerPrinterPage customerPrinterData = service.loadDataFromTable(tableName, offset, elements);
-            consolePrinter.printCustomers(tableName, customerPrinterData);
+            DataPage dataPage = service.loadDataFromTable(tableName, tableDetails, offset, elements);
+            consolePrinter.printTable(dataPage, tableName);
             consolePrinter.print(tableName, Arrays.stream(getOptions()).toList());
             System.out.print("Wybierz: ");
             int userInput = inputCollector.getNumericInput(getOptions().length);

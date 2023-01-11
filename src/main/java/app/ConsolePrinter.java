@@ -1,9 +1,7 @@
 package app;
 
-import customer.CustomerDTO;
-import customer.CustomerDTOSize;
-import customer.CustomerPrinterPage;
-
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ConsolePrinter {
@@ -36,156 +34,41 @@ public class ConsolePrinter {
         System.out.println(bottomLine);
     }
 
-    public void printCustomers(String tableName, CustomerPrinterPage customerPrinterData) {
-        CustomerDTOSize size = customerPrinterData.getSize();
-        List<CustomerDTO> dto = customerPrinterData.getDto();
-        int totalLength = size.getId() + size.getFirstName() + size.getLastName() + size.getBirthDate()
-                + size.getPhone() + size.getAddress() + size.getCity() + size.getState() + size.getPoints() + (offset * 2);
-        System.out.println(getTopLine(totalLength + 8, tableName));
-        printEmptyLine(totalLength + 8);
+    public void printTable(DataPage dataPage, String tableName) {
+        LinkedList<LinkedList<String>> data = dataPage.getData();
+        LinkedHashMap<String, Integer> maxRowLength = dataPage.getMaxRowLength();
+        List<Integer> maxLengths = maxRowLength.values().stream().toList();
+        int totalLength = maxRowLength.values().stream().reduce(0, Integer::sum) + (data.get(0).size() * 3) +1;
 
-        printSummary(totalLength + 8, customerPrinterData.getOffset(), customerPrinterData.getElements());
-        printEmptyLine(totalLength + 8);
+        System.out.println(getTopLine(totalLength, tableName));
+        printEmptyLine(totalLength);
 
-        dto.forEach(customer -> {
-            // Left offset
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("+");
-           for (int i = 0; i < offset; i++) {
-               stringBuilder.append(" ");
-           }
+        for (LinkedList<String> line : data) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("+");
+            sb.append(" ".repeat(offset));
+            for (int j = 0; j < line.size(); j++) {
+                String text = line.get(j);
+                Integer max = maxLengths.get(j);
+                int textLength = text == null ? 4 : text.length();
 
-           // customer_id
-           stringBuilder.append("| ");
-           int leftSpace = (size.getId() - customer.getId().length()) / 2;
-           for (int i = 0; i < leftSpace; i++) {
-               stringBuilder.append(" ");
-           }
-           stringBuilder.append(customer.getId());
-           int rightSpace = size.getId() - leftSpace - customer.getId().length();
-            for (int i = 0; i < rightSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(" |");
+                int leftSpace = (max - textLength) /2;
+                int rightSpace = max - textLength - leftSpace;
 
-            //customer_first_name
-            stringBuilder.append(" ");
-            leftSpace = (size.getFirstName() - customer.getFirstName().length()) / 2;
-            for (int i = 0; i < leftSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(customer.getFirstName());
-            rightSpace = size.getFirstName() - leftSpace - customer.getFirstName().length();
-            for (int i = 0; i < rightSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(" |");
+                sb.append("| ");
+                sb.append(" ".repeat(leftSpace));
+                sb.append(text);
+                sb.append(" ".repeat(rightSpace + 1));
 
-            //customer_last_name
-            stringBuilder.append(" ");
-            leftSpace = (size.getLastName() - customer.getLastName().length()) / 2;
-            for (int i = 0; i < leftSpace; i++) {
-                stringBuilder.append(" ");
             }
-            stringBuilder.append(customer.getLastName());
-            rightSpace = size.getLastName() - leftSpace - customer.getLastName().length();
-            for (int i = 0; i < rightSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(" |");
+            sb.append("|");
+            sb.append(" ".repeat(offset));
+            sb.append("+");
+            System.out.println(sb);
+        }
 
-            //customer_birth_name
-            stringBuilder.append(" ");
-            leftSpace = (size.getBirthDate() - customer.getBirthDate().length()) / 2;
-            for (int i = 0; i < leftSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(customer.getBirthDate());
-            rightSpace = size.getBirthDate() - leftSpace - customer.getBirthDate().length();
-            for (int i = 0; i < rightSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(" |");
-
-            //phone
-            stringBuilder.append(" ");
-            leftSpace = (size.getPhone() - (customer.getPhone() == null ? 4 : customer.getPhone().length())) / 2;
-            for (int i = 0; i < leftSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(customer.getPhone());
-            rightSpace = size.getPhone() - leftSpace - (customer.getPhone() == null ? 4 : customer.getPhone().length());
-            for (int i = 0; i < rightSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(" |");
-
-            //address
-            stringBuilder.append(" ");
-            leftSpace = (size.getAddress() - customer.getAddress().length()) / 2;
-            for (int i = 0; i < leftSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(customer.getAddress());
-            rightSpace = size.getAddress() - leftSpace - customer.getAddress().length();
-            for (int i = 0; i < rightSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(" |");
-
-            //city
-            stringBuilder.append(" ");
-            leftSpace = (size.getCity() - customer.getCity().length()) / 2;
-            for (int i = 0; i < leftSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(customer.getCity());
-            rightSpace = size.getCity() - leftSpace - customer.getCity().length();
-            for (int i = 0; i < rightSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(" |");
-
-            //state
-            stringBuilder.append(" ");
-            leftSpace = (size.getState() - customer.getState().length()) / 2;
-            for (int i = 0; i < leftSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(customer.getState());
-            rightSpace = size.getState() - leftSpace - customer.getState().length();
-            for (int i = 0; i < rightSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(" |");
-
-            //points
-            stringBuilder.append(" ");
-            leftSpace = (size.getPoints() - customer.getPoints().length()) / 2;
-            for (int i = 0; i < leftSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(customer.getPoints());
-            rightSpace = size.getPoints() - leftSpace - customer.getPoints().length();
-            for (int i = 0; i < rightSpace; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append(" |");
-
-            //right offset
-            for (int i = 0; i < offset; i++) {
-                stringBuilder.append(" ");
-            }
-            stringBuilder.append("+");
-
-            System.out.println(stringBuilder);
-       });
-
-        printEmptyLine(totalLength + 8);
-        printEmptyLine(totalLength + 8);
-
-        System.out.println(getBottomLine(totalLength + 8));
-
+        printEmptyLine(totalLength);
+        System.out.println(getBottomLine(totalLength));
     }
 
     private void printSummary(int length, int pageOffset, int elements) {
