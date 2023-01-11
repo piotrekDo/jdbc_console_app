@@ -51,9 +51,9 @@ public class Repository {
         return results;
     }
 
-    public LinkedList<LinkedList<String>> selectDataFromTable(String tableName, Map<String, String> tableDetails, int offset, int elements) {
+    public LinkedList<LinkedList<String>> selectDataFromTable(String tableName, Map<String, String> tableDetails, int offset, int elements, String sortBy, boolean isDescending) {
         LinkedList<LinkedList<String>> results = new LinkedList<>();
-        String sql = String.format("SELECT * FROM %s LIMIT ?, ?", tableName);
+        String sql = String.format("SELECT * FROM %s ORDER BY %s %s LIMIT ?, ?", tableName, sortBy, isDescending ? "DESC" : "ASC");
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, offset);
             statement.setInt(2, elements);

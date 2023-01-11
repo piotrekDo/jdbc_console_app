@@ -24,13 +24,16 @@ public class LoadDataFromTable {
         boolean runnning = true;
         int offset = 0;
         int elements = 50;
+        String sortyBy = (String) tableDetails.keySet().toArray()[0];
+        boolean isDescending = false;
         do {
-            DataPage dataPage = service.loadDataFromTable(tableName, tableDetails, offset, elements);
+            DataPage dataPage = service.loadDataFromTable(tableName, tableDetails, offset, elements, sortyBy, isDescending);
             consolePrinter.printTable(dataPage, tableName);
             consolePrinter.print(tableName, Arrays.stream(getOptions()).toList());
             System.out.print("Wybierz: ");
             int userInput = inputCollector.getNumericInput(getOptions().length);
             Options option = Options.values()[userInput];
+
             switch (option) {
 
                 case EXIT -> {
@@ -41,6 +44,11 @@ public class LoadDataFromTable {
                 }
                 case PREV -> {
                     offset = Math.max(offset - elements, 0);
+                }
+                case SORT -> {
+                    Sort sort = new SortOptions(consolePrinter, inputCollector, tableDetails, tableName).load(sortyBy, isDescending);
+                    sortyBy = sort.getSortBy();
+                    isDescending = sort.isDescending();
                 }
             }
         } while (runnning);
@@ -60,7 +68,8 @@ public class LoadDataFromTable {
     private enum Options {
         EXIT("Powrót"),
         NEXT("Kolejna strona"),
-        PREV("Poprzednia strona");
+        PREV("Poprzednia strona"),
+        SORT("Zmień sortowanie");
 
         private final String desc;
 
