@@ -1,7 +1,6 @@
 package app;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Map;
 
 
@@ -44,8 +43,6 @@ public class LoadDataFromTable {
                     offset = Math.max(offset - elements, 0);
                 }
             }
-
-
         } while (runnning);
     }
 

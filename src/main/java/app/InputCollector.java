@@ -16,7 +16,7 @@ public class InputCollector {
                 input.nextLine();
             }
             if (userInput > 0 && userInput < range) return userInput;
-            else if (userInput == 0);
+            else if (userInput == 0) ;
             else {
                 System.out.println("Niepoprawna wartość");
                 System.out.print("Wybierz: ");

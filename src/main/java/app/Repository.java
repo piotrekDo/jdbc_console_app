@@ -1,8 +1,5 @@
 package app;
 
-import customer.CustomerEntity;
-import customer.CustomerParser;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,26 +49,6 @@ public class Repository {
             System.out.println("Unexpected error occurred " + e.getMessage());
         }
         return results;
-    }
-
-
-    public LinkedList<CustomerEntity> selectDataFromCustomersTable(int offset, int elements) {
-        LinkedList<CustomerEntity> customerEntities = new LinkedList<>();
-
-        try (PreparedStatement statement = connection.prepareStatement(
-                "SELECT * FROM customers LIMIT ?, ?;")) {
-            statement.setInt(1, offset);
-            statement.setInt(2, elements);
-
-            final ResultSet resultSet = statement.executeQuery();
-            CustomerParser customerParser = new CustomerParser(null);
-            while (resultSet.next()) {
-                customerEntities.add(customerParser.parseToCustomer(resultSet));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return customerEntities;
     }
 
     public LinkedList<LinkedList<String>> selectDataFromTable(String tableName, Map<String, String> tableDetails, int offset, int elements) {

@@ -38,7 +38,7 @@ public class ConsolePrinter {
         LinkedList<LinkedList<String>> data = dataPage.getData();
         LinkedHashMap<String, Integer> maxRowLength = dataPage.getMaxRowLength();
         List<Integer> maxLengths = maxRowLength.values().stream().toList();
-        int totalLength = maxRowLength.values().stream().reduce(0, Integer::sum) + (data.get(0).size() * 3) +1;
+        int totalLength = maxRowLength.values().stream().reduce(0, Integer::sum) + (data.get(0).size() * 3) + 1;
 
         System.out.println(getTopLine(totalLength, tableName));
         printEmptyLine(totalLength);
@@ -52,7 +52,7 @@ public class ConsolePrinter {
                 Integer max = maxLengths.get(j);
                 int textLength = text == null ? 4 : text.length();
 
-                int leftSpace = (max - textLength) /2;
+                int leftSpace = (max - textLength) / 2;
                 int rightSpace = max - textLength - leftSpace;
 
                 sb.append("| ");
