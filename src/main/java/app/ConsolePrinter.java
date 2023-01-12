@@ -19,14 +19,10 @@ public class ConsolePrinter {
         for (String string : data) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("+");
-            for (int i = 0; i < offset; i++) {
-                stringBuilder.append(" ");
-            }
+            stringBuilder.append(" ".repeat(offset));
             stringBuilder.append(string);
             int rightSpace = length + offset - string.length();
-            for (int i = 0; i < rightSpace; i++) {
-                stringBuilder.append(" ");
-            }
+            stringBuilder.append(" ".repeat(Math.max(0, rightSpace)));
             stringBuilder.append("+");
             System.out.println(stringBuilder);
         }
@@ -74,16 +70,12 @@ public class ConsolePrinter {
     private void printSummary(int length, int pageOffset, int elements) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("+");
-        for (int i = 0; i < offset; i++) {
-            stringBuilder.append(" ");
-        }
+        stringBuilder.append(" ".repeat(offset));
 
         String message = String.format("Wyswietlam %d stronę, %d elementów", pageOffset / elements + 1, elements);
         stringBuilder.append(message);
 
-        for (int i = 0; i < length - offset - message.length(); i++) {
-            stringBuilder.append(" ");
-        }
+        stringBuilder.append(" ".repeat(Math.max(0, length - offset - message.length())));
 
         stringBuilder.append("+");
         System.out.println(stringBuilder);
@@ -92,9 +84,7 @@ public class ConsolePrinter {
     private void printEmptyLine(int length) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("+");
-        for (int i = 0; i < length + (offset * 2); i++) {
-            stringBuilder.append(" ");
-        }
+        stringBuilder.append(" ".repeat(Math.max(0, length + (offset * 2))));
         stringBuilder.append("+");
         System.out.println(stringBuilder);
     }
@@ -104,15 +94,11 @@ public class ConsolePrinter {
         int rightOffset = length + (offset * 2) - title.length() - leftOffset - 2;
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("+");
-        for (int i = 0; i < leftOffset; i++) {
-            stringBuilder.append("-");
-        }
+        stringBuilder.append("-".repeat(Math.max(0, leftOffset)));
         stringBuilder.append(" ");
         stringBuilder.append(title);
         stringBuilder.append(" ");
-        for (int i = 0; i < rightOffset; i++) {
-            stringBuilder.append("-");
-        }
+        stringBuilder.append("-".repeat(Math.max(0, rightOffset)));
         stringBuilder.append("+");
         return stringBuilder.toString();
     }
@@ -120,9 +106,7 @@ public class ConsolePrinter {
     private String getBottomLine(int length) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("+");
-        for (int i = 0; i < length + (offset * 2); i++) {
-            stringBuilder.append("-");
-        }
+        stringBuilder.append("-".repeat(Math.max(0, length + (offset * 2))));
         stringBuilder.append("+");
         return stringBuilder.toString();
     }

@@ -38,6 +38,6 @@ public class SortOptions {
         System.out.print("Wybierz: ");
         int userInput2 = inputCollector.getNumericInput(3);
 
-        return new Sort(strings.get(userInput - 1), userInput2  == 2);
+        return new Sort(strings.get(userInput - 1), userInput2 == 2);
     }
 }
