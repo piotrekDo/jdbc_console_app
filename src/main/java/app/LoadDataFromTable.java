@@ -1,8 +1,7 @@
 package app;
 
 import java.util.Arrays;
-import java.util.Map;
-
+import java.util.LinkedList;
 
 public class LoadDataFromTable {
 
@@ -10,9 +9,9 @@ public class LoadDataFromTable {
     private final InputCollector inputCollector;
     private final Service service;
     private final String tableName;
-    private final Map<String, String> tableDetails;
+    private final LinkedList<TableDetails> tableDetails;
 
-    public LoadDataFromTable(ConsolePrinter consolePrinter, InputCollector inputCollector, Service service, String tableName, Map<String, String> tableDetails) {
+    public LoadDataFromTable(ConsolePrinter consolePrinter, InputCollector inputCollector, Service service, String tableName, LinkedList<TableDetails> tableDetails) {
         this.consolePrinter = consolePrinter;
         this.inputCollector = inputCollector;
         this.service = service;
@@ -24,7 +23,7 @@ public class LoadDataFromTable {
         boolean runnning = true;
         int offset = 0;
         int elements = 50;
-        String sortyBy = (String) tableDetails.keySet().toArray()[0];
+        String sortyBy = tableDetails.get(0).getTableName();
         boolean isDescending = false;
         do {
             DataPage dataPage = service.loadDataFromTable(tableName, tableDetails, offset, elements, sortyBy, isDescending);

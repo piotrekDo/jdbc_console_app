@@ -22,7 +22,7 @@ public class Service {
         return tables;
     }
 
-    public DataPage loadDataFromTable(String table, Map<String, String> tableDetails, int offset, int elements, String sortBy, boolean isDescending) {
+    public DataPage loadDataFromTable(String table, LinkedList<TableDetails> tableDetails, int offset, int elements, String sortBy, boolean isDescending) {
         LinkedList<LinkedList<String>> results = repository.selectDataFromTable(table, tableDetails, offset, elements, sortBy, isDescending);
         LinkedHashMap<String, Integer> maxLengths = new LinkedHashMap<>();
         results.get(0).forEach(header -> maxLengths.put(header, 0));
@@ -37,7 +37,7 @@ public class Service {
         return new DataPage(results, maxLengths);
     }
 
-    public LinkedHashMap<String, String> fetchTableDetails(String tableName) {
+    public LinkedList<TableDetails> fetchTableDetails(String tableName) {
         return repository.fetchTableColumnsData(tableName);
     }
 }

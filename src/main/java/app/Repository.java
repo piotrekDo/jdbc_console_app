@@ -4,9 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Repository {
 
@@ -16,21 +15,26 @@ public class Repository {
         this.connection = connection;
     }
 
-    LinkedHashMap<String, String> fetchTableColumnsData(String tableName) {
-        LinkedHashMap<String, String> tableDetails = new LinkedHashMap<>();
+    LinkedList<TableDetails> fetchTableColumnsData(String tableName) {
+        LinkedList<TableDetails> tableDetails = new LinkedList<>();
         try (PreparedStatement statement = connection.prepareStatement("" +
-                "SELECT column_name, data_type\n" +
+                "SELECT column_name, data_type, column_key\n" +
                 "FROM INFORMATION_SCHEMA.COLUMNS\n" +
                 "WHERE table_schema != 'test' AND TABLE_NAME = ?;")) {
             statement.setString(1, tableName);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                tableDetails.put(resultSet.getString("column_name"), resultSet.getString("data_type"));
+                tableDetails.add(new TableDetails(
+                        resultSet.getString("column_name"),
+                        resultSet.getString("data_type"),
+                        resultSet.getString("column_key")
+                ));
             }
 
         } catch (Exception e) {
             System.err.print(e.getMessage());
         }
+        tableDetails.stream().filter(x -> x.getColumnKey().equals("MUL")).forEach(System.out::println);
         return tableDetails;
     }
 
@@ -51,7 +55,7 @@ public class Repository {
         return results;
     }
 
-    public LinkedList<LinkedList<String>> selectDataFromTable(String tableName, Map<String, String> tableDetails, int offset, int elements, String sortBy, boolean isDescending) {
+    public LinkedList<LinkedList<String>> selectDataFromTable(String tableName, LinkedList<TableDetails> tableDetails, int offset, int elements, String sortBy, boolean isDescending) {
         LinkedList<LinkedList<String>> results = new LinkedList<>();
         String sql = String.format("SELECT * FROM %s ORDER BY %s %s LIMIT ?, ?", tableName, sortBy, isDescending ? "DESC" : "ASC");
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -59,7 +63,7 @@ public class Repository {
             statement.setInt(2, elements);
 
             final ResultSet resultSet = statement.executeQuery();
-            LinkedList<String> headers = new LinkedList<>(tableDetails.keySet());
+            LinkedList<String> headers = tableDetails.stream().map(TableDetails::getTableName).collect(Collectors.toCollection(LinkedList::new));
             results.add(headers);
             while (resultSet.next()) {
                 LinkedList<String> row = new LinkedList<>();

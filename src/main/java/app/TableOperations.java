@@ -1,6 +1,5 @@
 package app;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class TableOperations {
         boolean running = true;
         do {
             consolePrinter.print(tableName, getOptions());
-            LinkedHashMap<String, String> tableDetails = service.fetchTableDetails(tableName);
+            LinkedList<TableDetails> tableDetails = service.fetchTableDetails(tableName);
             System.out.print("Wybierz: ");
             int userInput = inputCollector.getNumericInput(getOptions().size() - 1);
             TableOperationsMenu option = TableOperationsMenu.values()[userInput];
