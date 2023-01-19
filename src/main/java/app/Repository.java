@@ -91,8 +91,8 @@ public class Repository {
                 "WHERE\n" +
                 "    `constraint_schema` = SCHEMA()\n" +
                 "AND\n" +
-                "    `table_name` = 'orders'\n" +
+                "    `table_name` = '%s'\n" +
                 "AND\n" +
-                "    `referenced_column_name` IS NOT NULL;", tableName);
+                "    `referenced_column_name` IS NOT NULL;", tableName, tableName);
     }
 }
