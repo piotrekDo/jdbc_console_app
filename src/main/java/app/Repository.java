@@ -5,53 +5,30 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.LinkedList;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Repository {
 
     private final Connection connection;
+    private final RepositoryService service;
 
-    public Repository(Connection connection) {
+    public Repository(Connection connection, RepositoryService service) {
         this.connection = connection;
+        this.service = service;
     }
 
     LinkedList<TableDetails> fetchTableColumnsData(String tableName) {
         String query = getFetchTableDetailsQuery(tableName);
-        LinkedList<TableDetails> tableDetails = new LinkedList<>();
+        LinkedList<TableDetails> tableDetails = null;
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             ResultSet resultSet = statement.executeQuery();
-            boolean foreignDetails = false;
-            while (resultSet.next()) {
-                if (resultSet.getString("table_name").equals("FOREIGN_KEY")) {
-                    foreignDetails = true;
-                    continue;
-                }
 
-                if (!foreignDetails) {
-                    tableDetails.add(new TableDetails(
-                            resultSet.getString("table_name"),
-                            resultSet.getString("column_name"),
-                            resultSet.getString("data_type")
-                    ));
-                } else {
-                    String foreignKeyColumn = resultSet.getString("table_name");
-                    String foreignTableName = resultSet.getString("column_name");
-                    String foreignTableColumnName = resultSet.getString("data_type");
-                    tableDetails.stream().filter(column -> column.getColumnName().equals(foreignKeyColumn))
-                            .findFirst()
-                            .ifPresent(column -> {
-                                column.setForeignKey(true);
-                                column.setForeignTable(foreignTableName);
-                                column.setForeignTableColumnName(foreignTableColumnName);
-                            });
-                }
-            }
+            tableDetails = service.parseResultSetToTableDetails(resultSet);
 
         } catch (Exception e) {
             System.err.print(e.getMessage());
         }
-        tableDetails.forEach(System.out::println);
+        tableDetails.stream().filter(TableDetails::isForeignKey).forEach(System.out::println);
         return tableDetails;
     }
 
@@ -80,7 +57,7 @@ public class Repository {
             statement.setInt(2, elements);
 
             final ResultSet resultSet = statement.executeQuery();
-            LinkedList<String> headers = tableDetails.stream().map(TableDetails::getTableName).collect(Collectors.toCollection(LinkedList::new));
+            LinkedList<String> headers = tableDetails.stream().map(TableDetails::getColumnName).collect(Collectors.toCollection(LinkedList::new));
             results.add(headers);
             while (resultSet.next()) {
                 LinkedList<String> row = new LinkedList<>();
@@ -90,7 +67,6 @@ public class Repository {
                 results.add(row);
             }
 
-            return results;
         } catch (Exception e) {
             e.printStackTrace();
         }

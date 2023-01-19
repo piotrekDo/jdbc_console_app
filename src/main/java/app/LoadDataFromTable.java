@@ -23,7 +23,7 @@ public class LoadDataFromTable {
         boolean runnning = true;
         int offset = 0;
         int elements = 50;
-        String sortyBy = tableDetails.get(0).getTableName();
+        String sortyBy = tableDetails.get(0).getColumnName();
         boolean isDescending = false;
         do {
             DataPage dataPage = service.loadDataFromTable(tableName, tableDetails, offset, elements, sortyBy, isDescending);

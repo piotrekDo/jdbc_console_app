@@ -9,7 +9,8 @@ public class Main {
         Connection connection = getConnection();
         ConsolePrinter consolePrinter = new ConsolePrinter();
         InputCollector inputCollector = new InputCollector();
-        Repository repository = new Repository(connection);
+        RepositoryService repositoryService = new RepositoryService();
+        Repository repository = new Repository(connection, repositoryService);
         Service service = new Service(repository);
         Options options = new Options(consolePrinter, inputCollector, service);
 
