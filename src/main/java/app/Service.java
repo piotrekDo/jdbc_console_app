@@ -26,7 +26,11 @@ public class Service {
     public DataPage loadDataFromTable(String table, LinkedList<TableDetails> tableDetails, int offset, int elements, String sortBy, boolean isDescending) {
         LinkedList<LinkedList<String>> results = repository.selectDataFromTable(table, tableDetails, offset, elements, sortBy, isDescending);
         LinkedHashMap<String, Integer> maxLengths = new LinkedHashMap<>();
-        results.get(0).forEach(header -> maxLengths.put(header, 0));
+
+
+        IntStream.range(0, results.get(0).size())
+                .forEach(idx -> maxLengths.put(idx + results.get(0).get(idx) , 0));
+
 
         List<String> keys = maxLengths.keySet().stream().toList();
         IntStream.range(0, maxLengths.size())

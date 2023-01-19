@@ -1,9 +1,6 @@
 package app;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
@@ -52,17 +49,17 @@ public class Repository {
     public LinkedList<LinkedList<String>> selectDataFromTable(String tableName, LinkedList<TableDetails> tableDetails, int offset, int elements, String sortBy, boolean isDescending) {
         LinkedList<LinkedList<String>> results = new LinkedList<>();
         String query = service.getSelectDataFromTableQuery(tableName, tableDetails, sortBy, isDescending);
-        String sql = String.format("SELECT * FROM %s ORDER BY %s %s LIMIT ?, ?", tableName, sortBy, isDescending ? "DESC" : "ASC");
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, offset);
             statement.setInt(2, elements);
 
             final ResultSet resultSet = statement.executeQuery();
-            LinkedList<String> headers = tableDetails.stream().map(TableDetails::getColumnName).collect(Collectors.toCollection(LinkedList::new));
-            results.add(headers);
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
             while (resultSet.next()) {
                 LinkedList<String> row = new LinkedList<>();
-                for (int i = 1; i <= tableDetails.size(); i++) {
+                for (int i = 1; i <= columnCount; i++) {
                     row.add(resultSet.getString(i));
                 }
                 results.add(row);

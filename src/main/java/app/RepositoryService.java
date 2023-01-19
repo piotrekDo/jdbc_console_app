@@ -57,8 +57,9 @@ public class RepositoryService {
                 stringBuilder.append(", ");
             } else {
                 stringBuilder.append(column.getForeignTable());
-                stringBuilder.append(".");
-                stringBuilder.append(column.getForeignTableColumnName());
+                stringBuilder.append(".*");
+//                stringBuilder.append(".");
+//                stringBuilder.append(column.getForeignTableColumnName());
                 stringBuilder.append(", ");
             }
         });
