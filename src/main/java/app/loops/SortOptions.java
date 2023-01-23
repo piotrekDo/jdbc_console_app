@@ -13,7 +13,7 @@ public class SortOptions {
 
     private final ConsolePrinter consolePrinter;
     private final InputCollector inputCollector;
-    private final LinkedList<ColumnDetails> columnDetails;
+    private final LinkedList<ColumnDetails> columnsDetails;
     private final String tableName;
 
     /**
@@ -28,7 +28,7 @@ public class SortOptions {
     SortOptions(ConsolePrinter consolePrinter, InputCollector inputCollector, LinkedList<ColumnDetails> columnsDetails, String tableName) {
         this.consolePrinter = consolePrinter;
         this.inputCollector = inputCollector;
-        this.columnDetails = columnsDetails;
+        this.columnsDetails = columnsDetails;
         this.tableName = tableName;
     }
 
@@ -40,17 +40,17 @@ public class SortOptions {
      */
 
     Sort load(String sortBy, boolean isDescending) {
-        List<String> strings = columnDetails.stream().map(ColumnDetails::getTableName).collect(Collectors.toList());
-        LinkedList<String> strings1 = new LinkedList<>();
-        for (int i = 0; i < strings.size(); i++) {
-            strings1.add(i + 1 + " " + strings.get(i));
+        List<String> columnsDetailsColumnsNames = columnsDetails.stream().map(ColumnDetails::getColumnName).toList();
+        LinkedList<String> columns = new LinkedList<>();
+        for (int i = 0; i < columnsDetailsColumnsNames.size(); i++) {
+            columns.add(i + 1 + " " + columnsDetailsColumnsNames.get(i));
         }
-        strings1.add("");
-        strings1.add("0 Powrót");
+        columns.add("");
+        columns.add("0 Powrót");
 
-        consolePrinter.print(tableName + " wybierz sortowanie:", strings1);
+        consolePrinter.print(tableName + " wybierz sortowanie:", columns);
         System.out.print("Wybierz: ");
-        int userInput = inputCollector.getNumericInput(strings1.size() - 1);
+        int userInput = inputCollector.getNumericInput(columns.size() - 1);
         if (userInput == 0)
             return new Sort(sortBy, isDescending);
 
@@ -58,6 +58,6 @@ public class SortOptions {
         System.out.print("Wybierz: ");
         int userInput2 = inputCollector.getNumericInput(3);
 
-        return new Sort(strings.get(userInput - 1), userInput2 == 2);
+        return new Sort(columnsDetailsColumnsNames.get(userInput - 1), userInput2 == 2);
     }
 }
