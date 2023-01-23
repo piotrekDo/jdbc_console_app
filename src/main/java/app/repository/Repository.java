@@ -4,6 +4,7 @@ import app.model.ColumnDetails;
 
 import java.sql.*;
 import java.util.LinkedList;
+import java.util.stream.IntStream;
 
 public class Repository {
 
@@ -88,6 +89,16 @@ public class Repository {
             final ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
 
+            LinkedList<String> headers = new LinkedList<>();
+            IntStream.rangeClosed(1, columnCount).forEach(i -> {
+                try {
+                    headers.add(metaData.getColumnName(i).toUpperCase());
+                } catch (SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+            });
+            results.add(headers);
+
             while (resultSet.next()) {
                 LinkedList<String> row = new LinkedList<>();
                 for (int i = 1; i <= columnCount; i++) {
@@ -114,7 +125,7 @@ public class Repository {
                 "FROM INFORMATION_SCHEMA.COLUMNS\n" +
                 "WHERE table_schema != 'test' AND TABLE_NAME = '%s'\n" +
                 "UNION\n" +
-                "SELECT 'FOREIGN_KEY', 'FOREIGN_TABLE', 'FOREIGN_COLUMN' FROM orders\n" +
+                "SELECT 'FOREIGN_KEY', 'FOREIGN_TABLE', 'FOREIGN_COLUMN' FROM %s\n" +
                 "UNION\n" +
                 "SELECT\n" +
                 "    `column_name`, \n" +
@@ -127,6 +138,6 @@ public class Repository {
                 "AND\n" +
                 "    `table_name` = '%s'\n" +
                 "AND\n" +
-                "    `referenced_column_name` IS NOT NULL;", tableName, tableName);
+                "    `referenced_column_name` IS NOT NULL;", tableName, tableName, tableName);
     }
 }
