@@ -1,5 +1,12 @@
 package app;
 
+import app.io.ConsolePrinter;
+import app.io.InputCollector;
+import app.loops.MainOptionsMenu;
+import app.loops.Service;
+import app.repository.Repository;
+import app.repository.RepositoryService;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
