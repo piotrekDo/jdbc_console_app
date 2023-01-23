@@ -10,6 +10,16 @@ public class TableOperations {
     private final Service service;
     private final String tableName;
 
+    /**
+     * Object created when table was selected. Responsible for displaying table operations such as selecting data,
+     * editing, ect.
+     *
+     * @param consolePrinter class responsible for displaying data in user terminal,
+     * @param inputCollector class responsible for collecting data from user,
+     * @param service utility class containing service method to work with data,
+     * @param tableName selected table name
+     */
+
     public TableOperations(ConsolePrinter consolePrinter, InputCollector inputCollector, Service service, String tableName) {
         this.consolePrinter = consolePrinter;
         this.inputCollector = inputCollector;
@@ -17,11 +27,15 @@ public class TableOperations {
         this.tableName = tableName;
     }
 
+    /**
+     * Main method responsible for displaying all possible actions. Based on TableOperationsMenu enum.
+     */
+
     public void loadOptions() {
         boolean running = true;
         do {
             consolePrinter.print(tableName, getOptions());
-            LinkedList<TableDetails> tableDetails = service.fetchTableDetails(tableName);
+            LinkedList<ColumnDetails> columnsDetails = service.fetchTableDetails(tableName);
             System.out.print("Wybierz: ");
             int userInput = inputCollector.getNumericInput(getOptions().size() - 1);
             TableOperationsMenu option = TableOperationsMenu.values()[userInput];
@@ -31,11 +45,16 @@ public class TableOperations {
                     running = false;
                 }
                 case LOAD -> {
-                    new LoadDataFromTable(consolePrinter, inputCollector, service, tableName, tableDetails).load();
+                    new LoadDataFromTable(consolePrinter, inputCollector, service, tableName, columnsDetails).load();
                 }
             }
         } while (running);
     }
+
+    /**
+     * Auxiliary method used to retrieve description field from TableOperationsMenu enum.
+     * Description data is needed in ConsolePrinter in order to display further options.
+     */
 
     private List<String> getOptions() {
         LinkedList<String> options = new LinkedList<>();

@@ -8,6 +8,12 @@ public class ConsolePrinter {
 
     private final int offset = 10;
 
+    /**
+     * Method used to print data in table form.
+     * @param title header to be printed in top line
+     * @param data list of strings to be printed
+     */
+
     void print(String title, List<String> data) {
         System.out.println();
         System.out.println();
@@ -29,6 +35,12 @@ public class ConsolePrinter {
         printEmptyLine(length);
         System.out.println(bottomLine);
     }
+
+    /**
+     * Method used to print output from select statements.
+     * @param dataPage object representing a collections of table rows. Each row has a list of columns.
+     * @param tableName table name to be used as header in first line.
+     */
 
     public void printTable(DataPage dataPage, String tableName) {
         LinkedList<LinkedList<String>> data = dataPage.getData();

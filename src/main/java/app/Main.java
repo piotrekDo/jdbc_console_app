@@ -12,9 +12,9 @@ public class Main {
         RepositoryService repositoryService = new RepositoryService();
         Repository repository = new Repository(connection, repositoryService);
         Service service = new Service(repository);
-        Options options = new Options(consolePrinter, inputCollector, service);
+        MainOptionsMenu mainOptions = new MainOptionsMenu(consolePrinter, inputCollector, service);
 
-        options.mainLoop();
+        mainOptions.mainLoop();
 
         assert connection != null;
         connection.close();

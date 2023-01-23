@@ -5,24 +5,28 @@ import java.util.Scanner;
 public class InputCollector {
     Scanner input = new Scanner(System.in);
 
+    /**
+     * Method will collect numeric user input and return and integer.
+     * @param range argument representing available options subtracted by 1.
+     */
+
     int getNumericInput(int range) {
         int userInput = -1;
-
+        System.err.println(range);
         do {
             try {
                 userInput = input.nextInt();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             } finally {
                 input.nextLine();
             }
-            if (userInput > 0 && userInput < range) return userInput;
-            else if (userInput == 0) ;
+            if (userInput >= 0 && userInput < range) return userInput;
             else {
                 System.out.println("Niepoprawna wartość");
                 System.out.print("Wybierz: ");
             }
         } while (userInput != 0);
 
-        return 0;
+        return userInput;
     }
 }

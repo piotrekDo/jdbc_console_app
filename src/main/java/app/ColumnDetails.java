@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+
 @Getter
 @Setter
 @AllArgsConstructor
 @ToString
-public class TableDetails {
+public class ColumnDetails {
     private String tableName;
     private String columnName;
     private String dataType;
@@ -17,7 +18,7 @@ public class TableDetails {
     private String foreignTable;
     private String foreignTableColumnName;
 
-    public TableDetails(String tableName, String columnName, String dataType) {
+    public ColumnDetails(String tableName, String columnName, String dataType) {
         this.tableName = tableName;
         this.columnName = columnName;
         this.dataType = dataType;

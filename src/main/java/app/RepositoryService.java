@@ -6,10 +6,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+/**
+ * Auxiliary class containing methods used in Repository to parse data and create queries.n
+ */
+
 public class RepositoryService {
 
-    LinkedList<TableDetails> parseResultSetToTableDetails(ResultSet resultSet) {
-        LinkedList<TableDetails> tableDetails = new LinkedList<>();
+    /**
+     * Method used in Repository to parse ResultSet to ColumnDetails list
+     */
+
+    LinkedList<ColumnDetails> parseResultSetToTableDetails(ResultSet resultSet) {
+        LinkedList<ColumnDetails> columnsDetails = new LinkedList<>();
         boolean foreignDetails = false;
         try {
             while (resultSet.next()) {
@@ -19,7 +27,7 @@ public class RepositoryService {
                 }
 
                 if (!foreignDetails) {
-                    tableDetails.add(new TableDetails(
+                    columnsDetails.add(new ColumnDetails(
                             resultSet.getString("table_name"),
                             resultSet.getString("column_name"),
                             resultSet.getString("data_type")
@@ -28,7 +36,7 @@ public class RepositoryService {
                     String foreignKeyColumn = resultSet.getString("table_name");
                     String foreignTableName = resultSet.getString("column_name");
                     String foreignTableColumnName = resultSet.getString("data_type");
-                    tableDetails.stream().filter(column -> column.getColumnName().equals(foreignKeyColumn))
+                    columnsDetails.stream().filter(column -> column.getColumnName().equals(foreignKeyColumn))
                             .findFirst()
                             .ifPresent(column -> {
                                 column.setForeignKey(true);
@@ -40,16 +48,27 @@ public class RepositoryService {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return tableDetails;
+        return columnsDetails;
     }
 
-    public String getSelectDataFromTableQuery(String tableName, LinkedList<TableDetails> tableDetails, String sortBy, boolean isDescending) {
-        List<TableDetails> foreignKeys = tableDetails.stream().filter(x -> x.isForeignKey() && !x.getForeignTable().equals(tableName)).toList();
+    /**
+     * Method used in Repository to build complex, generic query and generate smart joins from foreign keys.
+     * @param tableName name of table to acquire data from.
+     * @param columnDetails collection containing ColumnDetails object indicating which column is a foreign key.
+     * @param sortBy name of a column to be sorted by.
+     * @param isDescending direction of sorting.
+     * @return method will return a query string used in PrepareStatement.
+     */
+
+    public String getSelectDataFromTableQuery(String tableName, LinkedList<ColumnDetails> columnDetails, String sortBy, boolean isDescending) {
+        List<ColumnDetails> foreignKeys = columnDetails.stream()
+                .filter(x -> x.isForeignKey() && !x.getForeignTable().equals(tableName))
+                .toList();
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("SELECT ");
-        IntStream.range(0, tableDetails.size()).forEach(i -> {
-            TableDetails column = tableDetails.get(i);
+        IntStream.range(0, columnDetails.size()).forEach(i -> {
+            ColumnDetails column = columnDetails.get(i);
             if (!column.isForeignKey()) {
                 stringBuilder.append(column.getTableName());
                 stringBuilder.append(".");
@@ -58,8 +77,6 @@ public class RepositoryService {
             } else {
                 stringBuilder.append(column.getForeignTable());
                 stringBuilder.append(".*");
-//                stringBuilder.append(".");
-//                stringBuilder.append(column.getForeignTableColumnName());
                 stringBuilder.append(", ");
             }
         });
@@ -69,7 +86,7 @@ public class RepositoryService {
         stringBuilder.append(tableName);
         if (foreignKeys.size() > 0)
             IntStream.range(0, foreignKeys.size()).forEach(i -> {
-                TableDetails foreignKey = foreignKeys.get(i);
+                ColumnDetails foreignKey = foreignKeys.get(i);
                 stringBuilder.append(" LEFT JOIN ");
                 stringBuilder.append(foreignKey.getForeignTable());
                 stringBuilder.append(" ON ");

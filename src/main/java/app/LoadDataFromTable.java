@@ -5,28 +5,44 @@ import java.util.LinkedList;
 
 public class LoadDataFromTable {
 
+
     private final ConsolePrinter consolePrinter;
     private final InputCollector inputCollector;
     private final Service service;
     private final String tableName;
-    private final LinkedList<TableDetails> tableDetails;
+    private final LinkedList<ColumnDetails> columnsDetails;
 
-    public LoadDataFromTable(ConsolePrinter consolePrinter, InputCollector inputCollector, Service service, String tableName, LinkedList<TableDetails> tableDetails) {
+    /**
+     * Object created when table was selected, and data is loaded. Responsible for load data and managing
+     * pagination and sorting options
+     *
+     * @param consolePrinter class responsible for displaying data in user terminal,
+     * @param inputCollector class responsible for collecting data from user,
+     * @param service        utility class containing service method to work with data,
+     * @param tableName      selected table name,
+     * @param columnsDetails collection of ColumnDetails object representing metadata of each column.
+     */
+
+    public LoadDataFromTable(ConsolePrinter consolePrinter, InputCollector inputCollector, Service service, String tableName, LinkedList<ColumnDetails> columnsDetails) {
         this.consolePrinter = consolePrinter;
         this.inputCollector = inputCollector;
         this.service = service;
         this.tableName = tableName;
-        this.tableDetails = tableDetails;
+        this.columnsDetails = columnsDetails;
     }
 
+    /**
+     * Main method responsible for loading data and presenting further options.
+     */
+
     void load() {
-        boolean runnning = true;
+        boolean isRunning = true;
         int offset = 0;
         int elements = 50;
-        String sortyBy = tableDetails.get(0).getColumnName();
+        String sortyBy = columnsDetails.get(0).getColumnName();
         boolean isDescending = false;
         do {
-            DataPage dataPage = service.loadDataFromTable(tableName, tableDetails, offset, elements, sortyBy, isDescending);
+            DataPage dataPage = service.loadDataFromTable(tableName, columnsDetails, offset, elements, sortyBy, isDescending);
             consolePrinter.printTable(dataPage, tableName);
             consolePrinter.print(tableName, Arrays.stream(getOptions()).toList());
             System.out.print("Wybierz: ");
@@ -36,7 +52,7 @@ public class LoadDataFromTable {
             switch (option) {
 
                 case EXIT -> {
-                    runnning = false;
+                    isRunning = false;
                 }
                 case NEXT -> {
                     offset += elements;
@@ -45,13 +61,18 @@ public class LoadDataFromTable {
                     offset = Math.max(offset - elements, 0);
                 }
                 case SORT -> {
-                    Sort sort = new SortOptions(consolePrinter, inputCollector, tableDetails, tableName).load(sortyBy, isDescending);
+                    Sort sort = new SortOptions(consolePrinter, inputCollector, columnsDetails, tableName).load(sortyBy, isDescending);
                     sortyBy = sort.getSortBy();
                     isDescending = sort.isDescending();
                 }
             }
-        } while (runnning);
+        } while (isRunning);
     }
+
+    /**
+     * Auxiliary method responsible for extracting description from Options enum.
+     * Returned array is needed in ConsolePrinter in order to display further options.
+     */
 
     private String[] getOptions() {
         String[] options = new String[Options.values().length];

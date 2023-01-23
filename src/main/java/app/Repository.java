@@ -2,32 +2,49 @@ package app;
 
 import java.sql.*;
 import java.util.LinkedList;
-import java.util.stream.Collectors;
 
 public class Repository {
 
     private final Connection connection;
     private final RepositoryService service;
 
+    /**
+     * Repository class used to communicate with database.
+     *
+     * @param service service class containing methods used to parse data.
+     */
+
     public Repository(Connection connection, RepositoryService service) {
         this.connection = connection;
         this.service = service;
     }
 
-    LinkedList<TableDetails> fetchTableColumnsData(String tableName) {
-        String query = getFetchTableDetailsQuery(tableName);
-        LinkedList<TableDetails> tableDetails = null;
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            ResultSet resultSet = statement.executeQuery();
+    /**
+     * Method returning a collection of ColumnDetail object.
+     *
+     * @param tableName table name required in order to obtain data.
+     * @return ColumnDetail object will contain information regarding table name, column name, foreign key data, ect.
+     */
 
-            tableDetails = service.parseResultSetToTableDetails(resultSet);
+    LinkedList<ColumnDetails> fetchTableColumnsData(String tableName) {
+        String query = getFetchTableDetailsQuery(tableName);
+        LinkedList<ColumnDetails> columnDetails = null;
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            final ResultSet resultSet = statement.executeQuery();
+
+            columnDetails = service.parseResultSetToTableDetails(resultSet);
 
         } catch (Exception e) {
             System.err.print(e.getMessage());
         }
-        tableDetails.stream().filter(TableDetails::isForeignKey).forEach(System.out::println);
-        return tableDetails;
+        assert columnDetails != null;
+        columnDetails.stream().filter(ColumnDetails::isForeignKey).forEach(System.out::println);
+        return columnDetails;
     }
+
+    /**
+     * Method used to retrieve all tables available within database.
+     */
 
     LinkedList<String> getAllTableNames() {
         LinkedList<String> results = new LinkedList<>();
@@ -46,15 +63,26 @@ public class Repository {
         return results;
     }
 
-    public LinkedList<LinkedList<String>> selectDataFromTable(String tableName, LinkedList<TableDetails> tableDetails, int offset, int elements, String sortBy, boolean isDescending) {
+    /**
+     * Method returning a collection of data from database table.
+     * @param tableName database table to retrieve data from.
+     * @param columnsDetails collection of metadata regarding columns within database table.
+     * @param offset number of items skipped, used for pagination.
+     * @param elements number elements to be retrieved, used for pagination.
+     * @param sortBy column name to be sorted by.
+     * @param isDescending sorting direction.
+     * @return returns a list of rows. Each row is represented by list containing columns in that row. 
+     */
+
+    public LinkedList<LinkedList<String>> selectDataFromTable(String tableName, LinkedList<ColumnDetails> columnsDetails, int offset, int elements, String sortBy, boolean isDescending) {
         LinkedList<LinkedList<String>> results = new LinkedList<>();
-        String query = service.getSelectDataFromTableQuery(tableName, tableDetails, sortBy, isDescending);
+        String query = service.getSelectDataFromTableQuery(tableName, columnsDetails, sortBy, isDescending);
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, offset);
             statement.setInt(2, elements);
 
             final ResultSet resultSet = statement.executeQuery();
-            ResultSetMetaData metaData = resultSet.getMetaData();
+            final ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
 
             while (resultSet.next()) {
@@ -72,12 +100,17 @@ public class Repository {
         return results;
     }
 
+    /**
+     * Auxiliary method used to prepare query used in fetchTableColumnsData method.
+     * @param tableName table name required to collect data from.
+     */
+
     private String getFetchTableDetailsQuery(String tableName) {
         return String.format("SELECT table_name, column_name, data_type\n" +
                 "FROM INFORMATION_SCHEMA.COLUMNS\n" +
                 "WHERE table_schema != 'test' AND TABLE_NAME = '%s'\n" +
                 "UNION\n" +
-                "SELECT 'FOREIGN_KEY', 'FOREGIN_TABLE', 'FOREGIN_COLUMN' FROM orders\n" +
+                "SELECT 'FOREIGN_KEY', 'FOREIGN_TABLE', 'FOREIGN_COLUMN' FROM orders\n" +
                 "UNION\n" +
                 "SELECT\n" +
                 "    `column_name`, \n" +

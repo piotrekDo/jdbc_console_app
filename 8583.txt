@@ -1,0 +1,4 @@
+Protokół ISO 8583:
+
+Za każdym razem gdy wykonujemy trnaskcję bezgotówkową, dane dotyczące transkacji są przesyłene do różnych systemów
+procesujących transakcję. Standard ISO 8583 określa strukturę informacji oraz jej zawartość.

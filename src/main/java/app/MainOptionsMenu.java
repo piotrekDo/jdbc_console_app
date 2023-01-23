@@ -2,17 +2,21 @@ package app;
 
 import java.util.Arrays;
 
-public class Options {
+public class MainOptionsMenu {
 
     private final ConsolePrinter consolePrinter;
     private final InputCollector inputCollector;
     private final Service service;
 
-    public Options(ConsolePrinter consolePrinter, InputCollector inputCollector, Service service) {
+    public MainOptionsMenu(ConsolePrinter consolePrinter, InputCollector inputCollector, Service service) {
         this.consolePrinter = consolePrinter;
         this.inputCollector = inputCollector;
         this.service = service;
     }
+
+    /**
+     * Main loop of the program. Displaying possible entry options such as retrieving tables.
+     */
 
     public void mainLoop() {
         boolean running = true;
@@ -27,11 +31,16 @@ public class Options {
                     System.out.println("Zamykam kontakt z bazą");
                 }
                 case LOAD -> {
-                    new LoadOptions(consolePrinter, inputCollector, service).loadOptions();
+                    new DisplayAvalibleTables(consolePrinter, inputCollector, service).loadOptions();
                 }
             }
         } while (running);
     }
+
+    /**
+     * Auxiliary method used to extract description fields from OptionsMenu enum.
+     * Returns array of string required by ConsolePrinter to display possible options.
+     */
 
     private String[] getMainOptions() {
         String[] options = new String[OptionsMenu.values().length];

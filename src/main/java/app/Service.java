@@ -1,11 +1,18 @@
 package app;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 public class Service {
 
     private final Repository repository;
+
+    /**
+     * Service class used in loop classes
+     */
 
     public Service(Repository repository) {
         this.repository = repository;
@@ -23,13 +30,13 @@ public class Service {
         return tables;
     }
 
-    public DataPage loadDataFromTable(String table, LinkedList<TableDetails> tableDetails, int offset, int elements, String sortBy, boolean isDescending) {
-        LinkedList<LinkedList<String>> results = repository.selectDataFromTable(table, tableDetails, offset, elements, sortBy, isDescending);
+    public DataPage loadDataFromTable(String table, LinkedList<ColumnDetails> columnDetails, int offset, int elements, String sortBy, boolean isDescending) {
+        LinkedList<LinkedList<String>> results = repository.selectDataFromTable(table, columnDetails, offset, elements, sortBy, isDescending);
         LinkedHashMap<String, Integer> maxLengths = new LinkedHashMap<>();
 
 
         IntStream.range(0, results.get(0).size())
-                .forEach(idx -> maxLengths.put(idx + results.get(0).get(idx) , 0));
+                .forEach(idx -> maxLengths.put(idx + results.get(0).get(idx), 0));
 
 
         List<String> keys = maxLengths.keySet().stream().toList();
@@ -42,7 +49,7 @@ public class Service {
         return new DataPage(results, maxLengths);
     }
 
-    public LinkedList<TableDetails> fetchTableDetails(String tableName) {
+    public LinkedList<ColumnDetails> fetchTableDetails(String tableName) {
         return repository.fetchTableColumnsData(tableName);
     }
 }
