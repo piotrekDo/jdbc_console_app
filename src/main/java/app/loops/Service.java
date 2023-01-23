@@ -39,8 +39,9 @@ public class Service {
         LinkedHashMap<String, Integer> maxLengths = new LinkedHashMap<>();
 
 
-        IntStream.range(0, results.get(0).size())
-                .forEach(idx -> maxLengths.put(idx + results.get(0).get(idx), 0));
+        if (results.size() > 0)
+            IntStream.range(0, results.get(0).size())
+                    .forEach(idx -> maxLengths.put(idx + results.get(0).get(idx), 0));
 
 
         List<String> keys = maxLengths.keySet().stream().toList();
