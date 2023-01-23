@@ -53,9 +53,12 @@ public class Repository {
         LinkedList<String> results = new LinkedList<>();
         try (Statement statement = connection.createStatement()) {
             final ResultSet resultSet = statement.executeQuery(
-                    "SELECT TABLE_NAME \n" +
-                            "FROM INFORMATION_SCHEMA.TABLES\n" +
-                            "WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='sql_store';");
+                    """
+                            SELECT TABLE_NAME
+                            FROM INFORMATION_SCHEMA.TABLES
+                            WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='sql_store';
+                            """);
+
 
             while (resultSet.next()) {
                 results.add(resultSet.getString(1));
@@ -121,23 +124,26 @@ public class Repository {
      */
 
     private String getFetchTableDetailsQuery(String tableName) {
-        return String.format("SELECT table_name, column_name, data_type\n" +
-                "FROM INFORMATION_SCHEMA.COLUMNS\n" +
-                "WHERE table_schema != 'test' AND TABLE_NAME = '%s'\n" +
-                "UNION\n" +
-                "SELECT 'FOREIGN_KEY', 'FOREIGN_TABLE', 'FOREIGN_COLUMN' FROM %s\n" +
-                "UNION\n" +
-                "SELECT\n" +
-                "    `column_name`, \n" +
-                "    `referenced_table_name`, \n" +
-                "    `referenced_column_name`\n" +
-                "FROM\n" +
-                "    `information_schema`.`KEY_COLUMN_USAGE`\n" +
-                "WHERE\n" +
-                "    `constraint_schema` = SCHEMA()\n" +
-                "AND\n" +
-                "    `table_name` = '%s'\n" +
-                "AND\n" +
-                "    `referenced_column_name` IS NOT NULL;", tableName, tableName, tableName);
+        return String.format(
+                """   
+                SELECT table_name, column_name, data_type
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE table_schema != 'test' AND TABLE_NAME = '%s'
+                UNION
+                SELECT 'FOREIGN_KEY', 'FOREIGN_TABLE', 'FOREIGN_COLUMN' FROM %s
+                UNION
+                SELECT
+                    `column_name`,
+                    `referenced_table_name`,
+                    `referenced_column_name`
+                FROM
+                    `information_schema`.`KEY_COLUMN_USAGE`
+                WHERE
+                    `constraint_schema` = SCHEMA()
+                AND
+                    `table_name` = '%s'
+                AND
+                    `referenced_column_name` IS NOT NULL;
+                """, tableName, tableName, tableName);
     }
 }
