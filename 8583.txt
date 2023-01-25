@@ -1,4 +1,206 @@
 Protokół ISO 8583:
 
 Za każdym razem gdy wykonujemy trnaskcję bezgotówkową, dane dotyczące transkacji są przesyłene do różnych systemów
-procesujących transakcję. Standard ISO 8583 określa strukturę informacji oraz jej zawartość.
+procesujących transakcję. Standard ISO 8583 określa strukturę informacji oraz jej zawartość. Jego celem jest
+umożliwinie różnym systemom swobodnej i bezpiecznej komunikacji.
+
+Grafika:
+https://www.codeproject.com/KB/scrapbook/ISO8583/Overall_1.jpg
+
+Struktura informacji ISO 8583:
+Header | MTI | Primary Bitnap | Secondary Bitmap | Data Elements
+
+Header: zawiera kod IIC- Institution Identification Code. Kod stanowi też informację o rozmiarze całej wiadomości.
+    Dla przykładu nagłówek 0158 stawnowi rozmiar wiadomości na 158bitów (MTI, bitmap, data elements).
+
+MTI- Message Type Indicator: MTI zawiera informację o wykorzystanej wersji protokołu ISO8583, jak również klasę
+    oraz funkcję wiadomości oraz jej pochodzenie. MTI składa się z czterech numerycznych części.
+    Dla przykładu MTI o wartośći 0110 oznacza wersję 1987 z klasą 'Authorization', funkcją 'Request Response' oraz
+    pochodzeniem 'Acquirer'. Zwykle aplikacje używają MTI do określenia czy wiadomość wymaga odpowiedzi oraz
+    ustanawiają jej format. Poniżej rozwinięcie możliwych numeracji.
+
+Grafika:
+https://sites.google.com/site/paymentsystemsblog/_/rsrc/1286316893693/iso8583-financial-transaction-message-format/0200-3.jpg
+pochodząca z :
+https://sites.google.com/site/paymentsystemsblog/iso8583-financial-transaction-message-format
+
+
+Poniżej tekstowa reprezentacja powyższego załącznika:
+
+    Wersja protokołu, ang. Version of ISO8583. Określana przez pierwszą część MTI.
+    Istnieją trzy wersje: 1987, 1993 oraz 2003.
+    0xxx oznacza ISO 8583:1987,
+    1xxx oznacza ISO 8583:1993,
+    2xxx oznacza ISO 8583:2003.
+    3xxx - 7xxx ZASTRZEŻONE DLA ISO.
+    8XXX ZASTRZEŻONE DLA UŻYTKU KRAJOWEGO(?)
+    9XXX ZASTRZEŻONE NA UŻYTEK PRYWATNY(?)
+---------------------------------------------
+
+    Klasa wiadomości, ang. Class of Message (Financial Transaction Request). Określana przez drugą część MTI.
+    x1xx oznacza Authorization Message,
+    x2xx oznacza Financial Message,
+    x3xx oznacza File Action Message,
+    x4xx oznacza Revelsal Message,
+    x5xx oznacza Reconciliation Message,
+    x6xx oznacza Administrative Message,
+    x7xx oznacza Fee Collection Message,
+    x8xx oznacza Network managment.
+    x9xx ZASTRZEŻONE DLA ISO.
+
+
+    Istnieją również podklasy, ang. Sub-Class
+    xx00 dla żądania wymagającego zatwierdzenia.
+    xx10 dla odpowiedzi na żądanie.
+    xx20 dla uzyskania dodatkowych informacji (ang.advice) dotyczących działania, które zostało już podjęte,
+            niewymagające zatwierdzenia, ale wciąż wymagające odpowiedzi.
+    xx30 dla odpowiedzi na prośbę dodatkowe informacje, patrz powyżej.
+    xx40 dla powiadomień
+    xx50 - xx90 ZASTRZEŻONE DLA ISO.
+
+    zwiększenie ostatniej cyfry oznacza powtórzenie żądania (z wyjątkiem kodów x300). Dla przykładu:
+    1100 oznacza żądanie autoryzacji, 1101 oznacza powtórzone żądanie autoryzacji.
+
+---------------------------------------------
+
+    Funkcja wiadomości, ang. Function of the Message (Request). Określana przez trzecią część MTI.
+    xx0x oznacza Request,
+    xx1x oznacza Request Response,
+    xx2x oznacza Advice,
+    xx3x oznacza Advice Response,
+    xx4x oznacza Notification,
+    xx8x ozbacza Response Ack. (acknowledge) - potwierdzenie,
+    xx9x oznacza Negative Ack. (acknowledge).
+---------------------------------------------
+
+    Pochodzenie wiadomości, ang. Origin- Who began rhe communication (Acquirer). Określana przez czwartą część MTI.
+    xxx0 oznacza Acquirer,
+    xxx0 oanacza Acquirer Repeat,
+    xxx2 oznacza Issuer,
+    xxx3 oznacza Issuer Repeat,
+    xxx4 Other,
+    xxx5 Other Repeat.
+    xxx6 -xxx9 ZASTRZEŻONE DLA ISO.
+
+Poniżej lista najczęściej występujących kodów MTI
+x100: Authorization Request
+x101: Authorization Request Repeat
+x102: Authorization completion confirmation
+x103: Authorization completion confirmation repeat
+x110: Authorization Response
+x112: Authorization completion response
+x120: Authorization Advice
+x121: Authorization advice repeat
+x122: Authorization advice completion confirmation
+x123: Authorization advice completion confirmation Report
+x130: Authorization Advice Response
+x132: Authorization advice completion response
+x200: Financial Request
+x210: Financial Response
+x220: Financial Advice
+x230: Financial Advice Response
+x300: Acquirer File Update Request
+x302: Issuer File Update Request]
+x310: Acquirer File Update Response
+x312: Issuer File Update Response
+x320: Acquirer File Update Advice
+x322: Issuer File Update Advice
+x330: Acquirer File Update Advice Response
+x332: Issuer File Update Advice Response
+x400: Acquirer Reversal Request
+x402: Issuer Reversal Request
+x410: Acquirer Reversal Request Response
+x412: Issuer Reversal Request Response
+x420: Acquirer Reversal Advice
+x422: Issuer Reversal Advice
+x430: Acquirer Reversal Advice Response
+x432: Issuer Reversal Advice Response
+x5xx: Reconciliation Request Messages
+x6xx: Administrative Request Messages
+x800: Network Management Request
+x810: Network Management Request Response
+
+
+
+
+Bitmaps: wiadomość musi zawierać conajmniej jedną, 8-bitową bitmapę- 'Primary Bitmap' zawierającą informację czy
+    w wiadomości występują inne, opcjonalne pola danych- 'Data Elements' o których poniżej.
+    Primary bitmap może zawierać informację o polach 1 do 64, jeżeli pól jest więcej w wiadomości zostanie umieszczona
+    'Secondary Bitmap' wskazująca na pola 65 do 128. Standard dopuszcza także wystąpienie trzeciej bitampay,
+    ang. 'Tertiary Bitmap' choć nie występuję ona często. Na wystąpienie 'Secondary Bitmap' wskazuje pierwszy
+    bit z 'Primary Bitmap'. Każdy kolejny bit dotyczy informacji o wystąpieniu konkretnego zasobu,
+    1: Secondary Bitmap,
+    2: Primary account number(PAN)
+    3: Processing Code
+    4: Amount, transaction
+    5: Amount, settlement
+    ...
+    64 oraz 128: Message authentication code
+    Dobrze obrazuje to 'bitmap decoder'
+    https://neapay.com/online-tools/bitmap-fields-decoder.html
+
+    ISO8583 dopuszcza także bitmapy w kodzie ósemkowym oraz szestnastkowym.
+
+
+
+Przykład bitmapy:
+https://images.surferseo.art/50fa68ea-9536-40fe-bf8c-e2a46039338d.png
+
+
+Data Elements: zawierają informacje o transkacji takie jak kwota, czas, data czy kod kraju. Różne organizacje
+    wykorzystujące standard ISO8583 mogą dostosowywać 'Data Elements' do swoich potrzeb. Istnieją także 'Data Elements'
+    ogólnego zastosowania oraz odpowiednie dla konkretnego systemu, które są pochodne od ISO8583. W zależności do
+    wersji standardu ISO8583 w wiadomości może wystąpić 128 'Data Elements' w przpzadku ISO 8583 (1987) lub 192 elementy
+    w przypadku późniejszych wersji.
+
+    Data Elements mogą przybierać różne formy danych takie jak wartości liczbowe, textowe czy binarne.
+
+
+Kody odpowiedzi nadawane przez banki, ang. credit card issuer.
+    Żądanie płatności może zostać odrzucone z wielu powodów i na każdym etapie transkacji. Proces przekazywania
+    informacji w cyklu życia transkacji jest złożony i wymaga uwzględnienia wielu aspektów. Poniżej skrócona
+    lista kodów odpowiedzi wraz z ich znaczeniem:
+
+    https://images.surferseo.art/f19b9e9b-a840-40db-bcee-969cbec14dda.png
+
+
+Przykładowa wiadomość:
+08002020 00000080 00000000 00000001 32393131 30303031
+
+MTI: 0800
+Bitmap: 20200000 00800000
+Field 03: 000000
+Field 11: 000001
+Field 41: 3239313130303031 (ASCII for "29110001")
+
+        MTI 0800 wskazujący na wersję ISO 8583 (1987)   - pierwsza cyfra 0,
+                klasa 'Network managment'               - druga cyfra 8,
+                podklasa/funkcja żądanie, ang. Request  - trzecia cyfra 0,
+                pochodząca od nabywcy, ang. Acquirer    - czwarta cyfra 0
+
+Następnie mamy bitmapę:
+2020000000800000
+HEX 20 = BIT 0010 0000 = pole 3, zatem Data Element 'Processing Code',
+HEX 20 = BIT 0010 0000 (to samo?) = pole 11, Data Element 'System Trace Audit Number',
+...
+HEX 80 = BIT 1000 0000 = pole 41, Data Element 'Card Acceptor Terminal Identification'
+...
+
+
+Pod adresem:
+https://www.codeproject.com/Articles/100084/Introduction-to-ISO
+
+Można znaleźć więcej omówionych przykładów.
+
+
+Podsumowując istnieje wiele implementacji ISO8583, oraz jeszcze więcej ich wariacji. Wszystkie jednak polegają
+na tym samym standardzie. Sam standard ISO8583 nie jest używany bezpośrednio przez systemy oraz sieci, zamiast
+tego istnieją rozmaite jego odmiany polegające na ISO 8583.
+
+
+
+Źródła:
+https://en.wikipedia.org/wiki/ISO_8583
+https://www.ir.com/guides/introduction-to-iso-8583
+https://sites.google.com/site/paymentsystemsblog/iso8583-financial-transaction-message-format
+https://www.codeproject.com/Articles/100084/Introduction-to-ISO

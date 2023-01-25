@@ -3,7 +3,7 @@ package app.io;
 import java.util.Scanner;
 
 public class InputCollector {
-    Scanner input = new Scanner(System.in);
+    Scanner input;
 
     /**
      * Method will collect numeric user input and return and integer.
@@ -12,6 +12,7 @@ public class InputCollector {
      */
 
     public int getNumericInput(int range) {
+        input = new Scanner(System.in);
         int userInput = -1;
         do {
             try {
@@ -26,7 +27,7 @@ public class InputCollector {
                 System.out.print("Wybierz: ");
             }
         } while (userInput != 0);
-
+        input.close();
         return userInput;
     }
 }
